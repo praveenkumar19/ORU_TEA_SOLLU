@@ -1,0 +1,6 @@
+{
+  "name": "Oru Tea Sollu! | Modern Tamil Tea Cafe in Ponmar, Chennai",
+  "description": "Experience Oru Tea Sollu! — a modern 3D Tamil tea cafe in Ponmar, Chennai. Fresh chai, authentic snacks, and unforgettable vibes. Order on WhatsApp or visit us.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

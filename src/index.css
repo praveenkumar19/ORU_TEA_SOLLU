@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-coffee: #24150F;
+    --color-cream: #FFF3DF;
+    --color-caramel: #C98242;
+    --color-leaf: #506B45;
+    --color-copper: #E78B45;
+    --color-softblack: #151311;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #151311;
+    color: #FFF3DF;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+  }
+
+  /* Universal pointer cursor for all buttons and interactive clickable elements */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* Global button pointer cursor override ensuring buttons consistently show hand pointer */
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  cursor: pointer;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #151311;
+}
+::-webkit-scrollbar-thumb {
+  background: #24150F;
+  border-radius: 4px;
+  border: 1px solid rgba(201, 130, 66, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C98242;
+}

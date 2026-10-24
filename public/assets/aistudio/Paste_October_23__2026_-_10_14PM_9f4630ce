@@ -1,0 +1,861 @@
+# MASTER DEVELOPMENT PROMPT — ORU TEA SOLLU!
+## Premium 3D Cafe Website + Complete Ordering, Billing, Delivery & Loyalty System
+
+Act as a senior full-stack developer, software architect, UI/UX designer, database engineer, payment workflow specialist, and 3D web animation expert.
+
+Upgrade my existing **Oru Tea Sollu!** website into a professional, fully functional cafe ordering platform with a premium 3D frontend, real order management, customer accounts, delivery tracking, billing, and a customer loyalty programme.
+
+### BUSINESS INFORMATION
+
+- Brand: Oru Tea Sollu!
+- Phone / WhatsApp: +91 90943 92300
+- Location: Ponmar, Chennai, Tamil Nadu, India
+- Currency: INR (₹)
+- Country: India
+- Time zone: Asia/Kolkata
+- Brand tagline: Every Sip Has a Story.
+- Payment method: Cash on Delivery, with cash or UPI payment when the order is delivered.
+- Order types: Dine-In and Parcel / Home Delivery.
+
+**Important:** Inspect my existing project before making changes. Preserve the existing website, 3D animations, styling, working pages, and framework. Do not create a duplicate project or replace the entire application unnecessarily.
+
+The goal is to build a working system, not merely a visual mockup.
+
+---
+
+## 1. PREMIUM 3D WEBSITE DESIGN
+
+Retain the existing premium 3D cafe experience.
+
+Use:
+- Deep coffee brown `#24150F`
+- Warm cream `#FFF3DF`
+- Tea caramel `#C98242`
+- Leaf green `#506B45`
+- Copper orange `#E78B45`
+
+Include a realistic animated tea glass, rising steam, subtle 3D parallax, beautiful menu cards, responsive navigation, smooth transitions, and premium food photography.
+
+The 3D effects must not slow down checkout, billing, or order tracking.
+
+The website must be responsive on desktop, tablet, and mobile.
+
+Main CTAs:
+- Explore Menu
+- Order Now
+- Track My Order
+- My Profile
+
+---
+
+## 2. COMPLETE MENU AND SHOPPING CART
+
+Create a working menu with categories such as:
+- Tea
+- Coffee
+- Cool Drinks
+- Snacks
+
+Use configurable menu data containing:
+- Product ID
+- Name
+- Description
+- Category
+- Image
+- Price in INR
+- Availability
+- Optional customisation
+
+The initial menu and prices must be editable by the cafe owner. Do not assume sample prices are confirmed real prices.
+
+Customers must be able to:
+1. Browse the menu.
+2. Add products to the cart.
+3. Increase or decrease quantities.
+4. Remove products.
+5. View subtotal.
+6. Select order type.
+7. Enter required customer details.
+8. Review the full bill.
+9. Place the order.
+10. View confirmation and track the order.
+
+Calculate every price on the server using the current menu prices. Never trust prices or discounts submitted directly by the browser.
+
+---
+
+## 3. ORDER TYPE SELECTION — DINE-IN OR PARCEL
+
+Before checkout, display two attractive selection cards.
+
+### Option A: Dine-In
+
+Label: “Enjoy Here”
+
+Description: “Order your favourites and enjoy them at our cafe.”
+
+When selected:
+- Ask for the customer's name.
+- Ask for their phone number.
+- Do not ask for a home delivery address.
+- Do not charge a home delivery fee.
+- Calculate applicable GST.
+- Generate a unique dine-in order ID in this format: `P@102`.
+- Show the order ID prominently after successful order creation.
+- Allow the customer to track order preparation.
+- Display an estimated preparation time only if the system has a configured estimate.
+
+Example:
+
+`P@102`
+
+This is an illustrative ID. Generate the actual ID from the database.
+
+Dine-in orders must never receive a delivery fee.
+
+### Option B: Parcel / Home Delivery
+
+Label: “Order for Delivery”
+
+Description: “Fresh chai and snacks delivered to your doorstep.”
+
+Ask the customer for:
+- Full name
+- Valid phone number
+- Complete delivery address
+- House / flat number
+- Street and locality
+- Landmark, if applicable
+- PIN code
+- Optional delivery instructions
+
+Also collect the customer's preferred contact method if necessary.
+
+For delivery orders:
+- Add the configured delivery charge.
+- Calculate applicable GST correctly.
+- Show the delivery fee before order confirmation.
+- Generate a unique parcel order ID.
+- Display the delivery address and order summary.
+- Allow customers to track the delivery after confirmation.
+
+**Do not use the dine-in `P@102` format for parcel orders.** Use a separate clear format such as `DEL-20261023-0001`, generated safely by the server.
+
+The exact format is configurable, but order IDs must never collide.
+
+If delivery is not available at a particular PIN code or location, prevent checkout and explain why.
+
+---
+
+## 4. UNIQUE ORDER ID GENERATION
+
+Implement reliable, database-backed order ID generation.
+
+Dine-in format:
+`P@102`
+
+Other examples:
+- `P@103`
+- `P@104`
+- `P@105`
+
+Parcel format:
+- `DEL-20261023-0001`
+- `DEL-20261023-0002`
+
+Rules:
+1. Every successfully created order receives exactly one ID.
+2. IDs must be unique across all orders.
+3. Two customers ordering simultaneously must not receive the same ID.
+4. Enforce uniqueness through a database constraint.
+5. Generate IDs transactionally on the backend.
+6. Do not generate IDs using random frontend JavaScript alone.
+7. Never reuse an ID after cancellation or deletion.
+8. Failed or abandoned checkout attempts should not create misleading confirmed orders.
+9. Store the order type with every order.
+10. Preserve order history for authorised staff and customers.
+
+For dine-in IDs, maintain a persistent counter rather than resetting the counter when the server restarts.
+
+---
+
+## 5. REAL BILL GENERATION WITH GST
+
+Generate a professional itemised bill for every successfully created order.
+
+The bill should contain:
+
+**ORU TEA SOLLU!**
+
+Ponmar, Chennai, Tamil Nadu
+
+Phone: +91 90943 92300
+
+Include:
+- Unique order ID
+- Order date and time
+- Order type
+- Customer name
+- Customer phone number
+- Delivery address, for delivery orders only
+- Item names
+- Quantities
+- Unit prices
+- Line totals
+- Subtotal
+- Eligible discounts
+- Taxable amount
+- Applicable GST breakdown
+- Delivery charge, if applicable
+- Final payable amount
+- Payment method
+- Payment status
+- Order status
+
+Example layout:
+
+| Description | Amount |
+|---|---:|
+| Tea × 2 | ₹40.00 |
+| Snacks × 1 | ₹30.00 |
+| Subtotal | ₹70.00 |
+| Discount | ₹0.00 |
+| Delivery charge | ₹20.00 |
+| Applicable GST | Calculated |
+| **Grand total** | **Calculated** |
+
+All amounts above are illustrative only. Configure actual menu prices, delivery charges, and tax rules before production.
+
+### GST requirements
+
+- Make GST rates configurable according to the cafe's actual products and applicable tax treatment.
+- Do not blindly apply one GST rate to every product.
+- Support CGST and SGST for applicable intra-state transactions.
+- Support IGST where legally applicable.
+- Calculate tax based on the correct taxable value and applicable rules.
+- Do not add GST twice if the configured menu price is already tax-inclusive.
+- Display tax-inclusive or tax-exclusive prices consistently.
+- Do not invent a GSTIN or imply the business is GST-registered unless verified.
+- Configure the appropriate receipt or tax invoice format for the business's actual registration status.
+- Confirm the final tax configuration with a qualified accountant before launch.
+
+Use decimal-safe money calculations, such as integer paise or a suitable decimal arithmetic library. Avoid floating-point rounding errors.
+
+### Bill actions
+
+Provide:
+- View Bill
+- Download / Print Bill
+- View Order Details
+- Track Order
+- Contact Cafe
+
+Generate a downloadable, print-friendly receipt or PDF using the final server-calculated order details.
+
+The receipt must not contain fake transaction IDs, invented GSTINs, or false payment confirmations.
+
+---
+
+## 6. PAYMENT: CASH OR UPI AT DELIVERY
+
+Use the following payment workflow:
+
+**Payment method:** Pay at Delivery
+
+Allow the customer to choose:
+- Cash
+- UPI
+
+The customer selects the preferred method during checkout, but payment is not marked completed until the cafe or authorised delivery staff confirms receipt.
+
+### Cash
+
+The customer pays cash when the parcel arrives.
+
+### UPI
+
+The customer pays by UPI when the parcel arrives.
+
+The website may display the cafe's verified UPI QR code or UPI ID if the owner provides one. Do not invent a UPI ID or claim a UPI payment was verified merely because the customer clicked a button.
+
+### Payment status values
+
+- Pending
+- Paid
+- Failed, where applicable
+- Refunded, where applicable
+
+For this COD-style workflow, the default status is `Pending`.
+
+Only authorised staff can mark an order as paid. If actual UPI transaction verification is later integrated, verify payment server-side with the provider.
+
+Display this message at checkout:
+
+“Pay when your order arrives. Choose cash or UPI at delivery. Your payment will be marked complete after the cafe confirms receipt.”
+
+Never ask customers to enter their UPI PIN on the website.
+
+---
+
+## 7. DELIVERY CHARGE CONFIGURATION
+
+Add a delivery pricing configuration in the admin dashboard.
+
+Allow the cafe owner to configure:
+- Base delivery fee
+- Minimum order value, if any
+- Free delivery threshold, if any
+- Eligible delivery PIN codes
+- Delivery availability
+- Optional distance-based fees
+- Estimated delivery time, when operationally known
+
+For initial development, use an editable sample delivery charge, such as ₹20. Clearly mark it as a placeholder until the owner confirms the actual charge.
+
+Rules:
+- Dine-in: delivery charge must always be ₹0.
+- Home delivery: apply the configured fee.
+- Display the fee before the customer places the order.
+- Include the fee in the bill.
+- Never silently change the final price after checkout.
+- Recalculate the final amount on the backend.
+- If a coupon reduces the item subtotal, apply the configured delivery-fee policy consistently.
+
+If delivery charges are taxable under the applicable rules, handle them correctly in the tax calculation.
+
+---
+
+## 8. ORDER CONFIRMATION AND TRACKING
+
+After a valid order is saved successfully, display a beautiful confirmation page.
+
+Show:
+- Order ID
+- Customer name
+- Order type
+- Order summary
+- Final bill
+- Payment method
+- Payment status
+- Estimated time, if configured
+- Live order status
+
+Create a visual progress tracker.
+
+Suggested status flow:
+
+1. Order Placed
+2. Awaiting Cafe Confirmation
+3. Confirmed
+4. Preparing
+5. Ready for Pickup — dine-in or parcel pickup
+6. Out for Delivery — home delivery only
+7. Delivered / Completed
+
+Additional states:
+- Rejected
+- Cancelled
+
+Use only valid state transitions. For example, an order cannot become Delivered before it has been dispatched.
+
+For dine-in:
+- Show the preparation progress.
+- Show “Ready” when staff marks the order ready.
+- Show completion when staff marks it completed.
+
+For home delivery:
+- Show preparation progress.
+- Show “Out for Delivery” after dispatch.
+- Show “Delivered” once the authorised staff member confirms delivery.
+
+### Tracking requirements
+
+- Create a dedicated Track Order page.
+- Allow a customer to view their orders from their profile.
+- Use real backend data, not a hardcoded progress animation.
+- Use WebSockets, server-sent events, or secure polling for status updates.
+- Use polling as a fallback if real-time connections are unavailable.
+- Customers should only access their own orders.
+- Protect order details from unauthorised users.
+- Do not expose customer addresses or phone numbers through public order IDs alone.
+- Require authenticated access or an appropriately protected tracking token.
+- Do not display an order as confirmed until an authorised staff member confirms it.
+
+---
+
+## 9. CUSTOMER REGISTRATION AND PROFILE SYSTEM
+
+Create a customer profile system for regular customers.
+
+Customers should be able to register or sign in using a secure authentication method.
+
+Collect only necessary data:
+- Full name
+- Verified phone number
+- Optional email address
+- Default delivery address, if the customer chooses to save it
+- Account creation date
+
+The profile page should show:
+- Customer name
+- Phone number
+- Order history
+- Total completed orders
+- Total spending, if appropriate
+- Current coupons
+- Used coupons
+- Expired coupons
+- Loyalty milestones
+- Saved addresses, with customer consent
+- Favourite menu items, optionally
+
+Allow customers to update their information and delete their account according to the application's retention and legal requirements.
+
+Do not create duplicate customer accounts simply because the same phone number is formatted differently.
+
+Normalise Indian phone numbers, verify ownership before account recovery, and avoid using a phone number alone as authentication without a secure verification process.
+
+For guests, allow checkout if the cafe chooses to support it, but provide a secure way to claim or associate the order with a customer account later.
+
+---
+
+## 10. REGULAR CUSTOMER LOYALTY PROGRAMME
+
+Build a loyalty system that rewards customers for returning to Oru Tea Sollu!
+
+### Milestone rewards
+
+Create automatic customer milestones:
+
+- 10th completed order: optional appreciation message.
+- 25th completed order: optional special reward.
+- 50th completed order: special customer offer.
+- 100th completed order: premium loyalty reward.
+
+The cafe owner must be able to enable, disable, and configure each reward.
+
+For example:
+
+“Congratulations! You've placed your 50th order with Oru Tea Sollu! Thank you for being part of our tea family.”
+
+The 50th-order and 100th-order rewards may include:
+- A special discount coupon
+- A percentage discount
+- A fixed-value discount
+- A selected complimentary item, if supported by the cafe
+
+Treat these as configurable reward examples, not promises of a currently active offer.
+
+### Accurate milestone counting
+
+- Count completed, eligible orders only.
+- Do not count cancelled or rejected orders.
+- Do not count failed checkout attempts.
+- Avoid counting the same order twice.
+- Do not award milestones repeatedly for the same order.
+- Store reward issuance in a database table with a uniqueness constraint.
+- Display the customer's progress toward the next milestone.
+- Let staff see loyalty status in the admin dashboard.
+
+---
+
+## 11. AUTOMATIC COUPON AFTER AN ELIGIBLE ₹200+ PURCHASE
+
+Implement a promotional coupon programme.
+
+### Eligibility
+
+When a customer's qualifying order has a merchandise subtotal of ₹200 or more, excluding delivery charges and taxes for eligibility purposes, issue one coupon for their next order.
+
+Example:
+
+Customer buys products worth ₹250.
+
+The order qualifies for one coupon.
+
+The coupon can be used on the next eligible order.
+
+**Important:** Calculate eligibility using the configured rule and the backend's verified item totals. Do not allow delivery fees, GST, or manipulated frontend values to make an otherwise ineligible order qualify.
+
+### Coupon properties
+
+Every coupon must contain:
+- Unique coupon code
+- Customer ID
+- Discount type
+- Discount value
+- Minimum eligible merchandise subtotal
+- Creation timestamp
+- Expiration timestamp
+- Redemption status
+- Associated qualifying order
+- Associated redemption order, when used
+
+Example code:
+
+`OTS-7K4P9X`
+
+Generate codes securely and enforce uniqueness in the database. The example is illustrative.
+
+### Expiry
+
+Coupons must expire **7 days after their issue timestamp**, using the Asia/Kolkata business time zone for customer-facing dates.
+
+Store timestamps consistently in the backend and enforce expiry on the server.
+
+Example:
+- Issued: 23 October 2026, 6:00 PM IST
+- Expires: 30 October 2026, 6:00 PM IST
+
+Show the exact expiry date and time on the profile page.
+
+### Coupon redemption rules
+
+- Each coupon belongs to one customer.
+- A coupon can be redeemed only once.
+- A coupon can only be used by its intended customer.
+- Expired coupons cannot be redeemed.
+- A coupon cannot be applied to the same order that earned it.
+- Apply the coupon to the next eligible order only.
+- Validate coupon status and eligibility server-side.
+- Prevent two simultaneous requests from redeeming the same coupon twice.
+- If the order is cancelled or refunded, apply the configured coupon reversal policy.
+- Never silently remove an earned coupon.
+- Clearly explain coupon eligibility and exclusions before checkout.
+
+### Discount configuration
+
+Create an admin setting for:
+- Fixed discount amount
+- Percentage discount
+- Minimum order value
+- Maximum discount, if applicable
+- Coupon validity in days — default 7
+- Whether coupons can be combined with other promotions
+- Whether the reward applies to dine-in, parcel, or both
+
+Use a configurable sample discount during development, such as ₹20 off a future qualifying order. Mark this as a sample until the owner approves the actual promotion.
+
+### Coupon example
+
+First eligible order:
+- Merchandise subtotal: ₹250
+- Order is completed.
+- System issues one unique coupon.
+- Coupon expires after seven days.
+
+Next order:
+- Customer signs in.
+- Selects their valid coupon.
+- Website validates the coupon.
+- Bill recalculates with the discount.
+- Coupon becomes redeemed only after the order is successfully created and the redemption transaction is committed.
+
+Display messages such as:
+
+“Your next tea break just got better! You've unlocked a special Oru Tea Sollu! coupon.”
+
+“Coupon expires in 5 days.”
+
+“Congratulations on your 50th order! You're one of our valued regulars.”
+
+These messages should only appear when the corresponding reward has genuinely been earned.
+
+---
+
+## 12. OWNER ADMIN DASHBOARD
+
+Create a protected admin dashboard for cafe staff.
+
+### Orders dashboard
+
+Display:
+- New orders
+- Awaiting confirmation
+- Confirmed orders
+- Orders being prepared
+- Ready orders
+- Orders out for delivery
+- Completed orders
+- Cancelled orders
+- Pending payments
+
+Provide search and filters for:
+- Order ID
+- Customer
+- Phone number, visible only to authorised staff
+- Order type
+- Date
+- Status
+- Payment method
+- Payment status
+
+### Order actions
+
+Authorised staff can:
+- Accept an order.
+- Reject an order with a reason.
+- Update preparation status.
+- Mark an order ready.
+- Mark a parcel as dispatched.
+- Mark an order delivered.
+- Mark dine-in orders completed.
+- Confirm cash payment.
+- Confirm UPI payment after checking receipt.
+- View or print the bill.
+
+Record staff identity, timestamps, and relevant changes in an audit log.
+
+### Menu management
+
+Allow the owner to:
+- Add products.
+- Edit prices.
+- Change availability.
+- Upload or change images.
+- Manage categories.
+- Configure tax categories.
+
+### Loyalty management
+
+Allow the owner to:
+- View customer order milestones.
+- Configure milestone rewards.
+- View issued coupons.
+- View redeemed and expired coupons.
+- Configure the ₹200 eligibility threshold.
+- Configure coupon discount amounts.
+- Set coupon expiry days.
+- Review loyalty activity.
+
+### Delivery management
+
+Allow the owner to:
+- Set the delivery charge.
+- Configure delivery areas.
+- Enable or disable delivery.
+- View delivery addresses.
+- Assign a delivery status.
+- Record delivery completion.
+
+Do not make admin pages accessible merely by hiding their links. Enforce authentication and role-based authorisation on the backend.
+
+---
+
+## 13. RECOMMENDED DATABASE DESIGN
+
+Use a reliable persistent database such as PostgreSQL or Supabase PostgreSQL.
+
+Create appropriate tables or equivalent entities:
+
+1. `customers`
+2. `customer_addresses`
+3. `menu_categories`
+4. `menu_items`
+5. `orders`
+6. `order_items`
+7. `order_status_history`
+8. `payments`
+9. `coupons`
+10. `coupon_redemptions`
+11. `loyalty_milestones`
+12. `loyalty_rewards`
+13. `delivery_zones`
+14. `tax_configurations`
+15. `admin_users`
+16. `audit_logs`
+17. `order_id_counters`
+
+Use:
+- Primary keys
+- Foreign keys
+- Database uniqueness constraints
+- Transactions
+- Indexes for order lookup
+- Server-side validation
+- Proper access-control policies
+
+Store an immutable snapshot of the purchased product name, unit price, quantity, discounts, and tax details in each order. Later menu price changes must not modify old bills.
+
+Do not store full card details, UPI PINs, or other unnecessary payment secrets.
+
+---
+
+## 14. SECURITY AND RELIABILITY
+
+This is a real customer ordering system, so security is essential.
+
+Implement:
+- Secure authentication and session management.
+- Server-side role-based authorisation.
+- Input validation.
+- Rate limiting for sensitive endpoints.
+- CSRF protection where applicable.
+- Secure password hashing if passwords are used.
+- Phone verification where appropriate.
+- Protection against SQL injection and XSS.
+- Secure handling of environment variables.
+- Customer data access controls.
+- Database backups and recovery procedures.
+- Server-side order and coupon validation.
+- Database transactions for order creation and coupon redemption.
+- Idempotency protection for duplicate order submissions.
+- Privacy-conscious logging.
+- Safe handling of rejected, cancelled, and refunded orders.
+
+Never store important order records or customer profiles only in localStorage.
+
+LocalStorage may be used for a temporary cart, but the backend must be authoritative for orders, billing, coupons, payments, and loyalty milestones.
+
+---
+
+## 15. NOTIFICATIONS
+
+Provide appropriate customer notifications for:
+- Order placed
+- Order confirmed
+- Order rejected
+- Preparing
+- Ready for pickup
+- Out for delivery
+- Delivered
+- Coupon earned
+- Coupon expiring soon
+- Loyalty milestone achieved
+
+Start with in-app notifications and optional WhatsApp handoff.
+
+If automatic WhatsApp notifications are implemented, use an authorised WhatsApp Business integration and its required credentials. Do not pretend that ordinary website links send messages automatically.
+
+Avoid duplicate notifications when an order status changes repeatedly.
+
+---
+
+## 16. TECHNICAL IMPLEMENTATION
+
+Preferred stack, if compatible with the existing project:
+- React + Vite frontend.
+- TypeScript where practical.
+- CSS or Tailwind CSS.
+- Three.js / React Three Fiber for the 3D hero.
+- Supabase PostgreSQL and Auth, or an equivalent secure backend.
+- Server-side functions or API endpoints for orders, billing, coupons, and status updates.
+- PDF generation for receipts.
+- Real-time subscriptions or secure polling for tracking.
+
+If the existing project uses another working framework, keep it unless there is a strong technical reason to migrate.
+
+Build reusable components:
+- `MenuSection`
+- `ProductCard`
+- `ShoppingCart`
+- `OrderTypeSelector`
+- `CustomerDetailsForm`
+- `DeliveryAddressForm`
+- `CheckoutSummary`
+- `BillReceipt`
+- `OrderConfirmation`
+- `OrderTracker`
+- `CustomerProfile`
+- `CouponCard`
+- `LoyaltyProgress`
+- `AdminOrders`
+- `AdminMenu`
+- `AdminLoyalty`
+
+Provide database migrations, sample development data, environment variable examples, setup instructions, and deployment documentation.
+
+Never include real secrets in the source code or GitHub repository.
+
+---
+
+## 17. REQUIRED TEST SCENARIOS
+
+Before declaring the project complete, test all these cases.
+
+**Dine-in**
+- Select dine-in.
+- Enter name and phone.
+- Confirm no delivery address is required.
+- Confirm delivery charge is ₹0.
+- Verify unique `P@...` ID.
+- Verify GST and total.
+- Confirm tracking works.
+
+**Home delivery**
+- Select parcel.
+- Enter name, phone, and full delivery address.
+- Verify delivery eligibility.
+- Verify configured delivery fee.
+- Verify tax and total.
+- Verify unique `DEL-...` ID.
+- Confirm payment starts as Pending.
+- Test cash and UPI payment-at-delivery selections.
+- Verify tracking changes after staff confirmation.
+
+**Billing**
+- Test multiple products and quantities.
+- Test decimal prices if supported.
+- Test discount calculation.
+- Test tax-inclusive and tax-exclusive configurations.
+- Verify that previous bills do not change after a menu price change.
+- Verify the printable receipt.
+
+**Coupons**
+- Test subtotal below ₹200.
+- Test subtotal exactly ₹200.
+- Test subtotal above ₹200.
+- Confirm delivery fees and GST do not incorrectly count toward the eligibility threshold.
+- Confirm one qualifying completed order issues only one coupon.
+- Confirm a coupon expires after seven days.
+- Confirm an expired coupon is rejected.
+- Confirm a coupon cannot be reused.
+- Confirm one customer cannot use another customer's coupon.
+- Test simultaneous redemption attempts.
+
+**Loyalty**
+- Test the 50th completed order.
+- Test the 100th completed order.
+- Confirm cancelled orders do not count.
+- Confirm the same order cannot award the same milestone twice.
+
+**Security**
+- Try accessing another customer's order.
+- Try accessing admin pages as a customer.
+- Try manipulating prices or discounts from the browser.
+- Try submitting duplicate orders.
+- Try reusing expired coupons.
+- Confirm all important validations happen on the server.
+
+**Responsive design**
+- Test mobile, tablet, and desktop.
+- Test checkout on a small mobile screen.
+- Ensure the bill remains readable.
+- Ensure the 3D effects have a graceful fallback.
+
+---
+
+## FINAL DELIVERY REQUIREMENTS
+
+Deliver a complete, integrated, working website—not just screenshots, frontend mockups, or disconnected components.
+
+The finished result must include:
+1. Premium animated 3D cafe website.
+2. Functional menu and cart.
+3. Dine-in and parcel checkout.
+4. Unique, persistent order IDs.
+5. Server-calculated bills and GST.
+6. Configurable delivery fees.
+7. Cash or UPI payment at delivery.
+8. Secure order confirmation and tracking.
+9. Customer profiles and order history.
+10. ₹200+ purchase coupon programme with seven-day expiry.
+11. 50th-order and 100th-order milestone rewards.
+12. Protected cafe admin dashboard.
+13. Persistent database and secure backend.
+14. Responsive UI and accessibility.
+15. Testing instructions and deployment documentation.
+
+Do not claim a feature is working until it has been implemented and tested. If a feature requires external credentials, business information, or third-party configuration, clearly identify what the owner must provide.
+
+**Final experience:** Oru Tea Sollu! should feel like a modern Chennai cafe with the ordering convenience of a professional food-ordering platform, the warmth of a neighbourhood tea kadai, and a loyalty system that gives customers a reason to come back for their next cup.
